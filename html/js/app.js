@@ -48,7 +48,6 @@ function($rootScope, $scope, rpcService, cleepService, blockUI, toast, $route, $
                     self.reloadConfig = true;
                 } else if( self.notConnected ) {
                     // unblock ui
-                    blockUI.stop();
                     self.notConnected = false;
                     $mdDialog.cancel();
 
