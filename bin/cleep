@@ -264,8 +264,7 @@ def check_app_documentation(app_name):
 
     if resp["error"]:
         exit_code = 1
-    else:
-        print(json.dumps(resp["data"]))
+    print(json.dumps(resp["data"]))
 
 def get_rpc_config(config, force_http):
     """
