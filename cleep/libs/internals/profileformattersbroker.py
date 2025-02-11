@@ -17,7 +17,8 @@ class ProfileFormattersBroker:
     It also ensures formatters use exiting events
     """
 
-    PYTHON_CLEEP_IMPORT_PATH = "cleep.modules."
+    # final dot mandatory to allow unit tests
+    PYTHON_CLEEP_MODULES_IMPORT_PATH = "cleep.modules."
     MODULES_DIR = "../../modules"
 
     def __init__(self, debug_enabled):
@@ -130,14 +131,25 @@ class ProfileFormattersBroker:
         Raises:
             Exception if internal error occured
         """
-        path = os.path.join(os.path.dirname(__file__), self.MODULES_DIR)
-        if not os.path.exists(path):
+        self.logger.debug("Loading modules formatters")
+        modules_path = os.path.join(os.path.dirname(__file__), self.MODULES_DIR)
+        if not os.path.exists(modules_path):
             self.crash_report.report_exception(
-                {"message": "Invalid module path", "path": path}
+                {"message": "Invalid module path", "path": modules_path}
             )
             raise Exception("Invalid modules path")
+        self.__load_formatters_from_path(modules_path, False)
 
-        self.logger.debug("Loading formatters:")
+        self.__dump_existing_formatters()
+
+    def __load_formatters_from_path(self, path, is_core):
+        """
+        Load formatters from specified path
+
+        Args:
+            path (str): path to walk through
+        """
+        self.logger.trace(" Searching formatters from %s", os.path.normpath(path))
         for root, _, filenames in sorted(os.walk(path)):
             for filename in filenames:
                 try:
@@ -146,51 +158,7 @@ class ProfileFormattersBroker:
                     parts = full_split_path(fullpath)
                     module_name = parts[-2]
                     if ext == ".py" and formatter.lower().endswith("formatter"):
-                        self.logger.debug(' Found "%s.%s"', module_name, formatter)
-                        mod_ = importlib.import_module(
-                            f"{self.PYTHON_CLEEP_IMPORT_PATH}{module_name}.{formatter}"
-                        )
-                        formatter_class_name = self.__get_formatter_class_name(
-                            formatter, mod_
-                        )
-                        if formatter_class_name:
-                            formatter_class_ = getattr(mod_, formatter_class_name)
-                            formatter_instance_ = formatter_class_(
-                                {"events_broker": self.events_broker}
-                            )
-
-                            # save reference on module where formatter was found
-                            if (
-                                formatter_instance_.event_name
-                                not in self.__existing_formatters
-                            ):
-                                self.__existing_formatters[
-                                    formatter_instance_.event_name
-                                ] = {}
-                            if (
-                                formatter_instance_.profile_name
-                                not in self.__existing_formatters[
-                                    formatter_instance_.event_name
-                                ]
-                            ):
-                                self.__existing_formatters[
-                                    formatter_instance_.event_name
-                                ][formatter_instance_.profile_name] = {}
-                            self.__existing_formatters[formatter_instance_.event_name][
-                                formatter_instance_.profile_name
-                            ][module_name] = formatter_instance_
-                            self.logger.debug(
-                                ' Set formatter "%s" from module "%s" for event "%s" and profile "%s"',
-                                formatter_class_name,
-                                module_name,
-                                formatter_instance_.event_name,
-                                formatter_instance_.profile_name,
-                            )
-                        else:
-                            self.logger.error(
-                                'Formatter class name must have the same name than filename in "%s"',
-                                formatter,
-                            )
+                        self.__load_formatter(module_name, formatter)
 
                 except AttributeError:  # pragma: no cover
                     self.logger.exception(
@@ -204,7 +172,51 @@ class ProfileFormattersBroker:
                         formatter,
                     )
 
-        self.__dump_existing_formatters()
+
+    def __load_formatter(self, module_name, formatter):
+        """
+        Load specified file as formatter
+
+        Args:
+            module_name (str): module name that holds the formatter
+            formatter (str): formatter name
+        """
+        self.logger.debug(' Found "%s.%s"', module_name, formatter)
+        import_path = f"{self.PYTHON_CLEEP_MODULES_IMPORT_PATH}{module_name}.{formatter}"
+        self.logger.trace(" Import path %s", import_path)
+        mod_ = importlib.import_module(import_path)
+        formatter_class_name = self.__get_formatter_class_name(formatter, mod_)
+        if formatter_class_name:
+            formatter_class_ = getattr(mod_, formatter_class_name)
+            formatter_instance_ = formatter_class_(
+                {"events_broker": self.events_broker}
+            )
+
+            # save reference on module where formatter was found
+            if formatter_instance_.event_name not in self.__existing_formatters:
+                self.__existing_formatters[formatter_instance_.event_name] = {}
+            if (
+                formatter_instance_.profile_name
+                not in self.__existing_formatters[formatter_instance_.event_name]
+            ):
+                self.__existing_formatters[formatter_instance_.event_name][
+                    formatter_instance_.profile_name
+                ] = {}
+            self.__existing_formatters[formatter_instance_.event_name][
+                formatter_instance_.profile_name
+            ][module_name] = formatter_instance_
+            self.logger.debug(
+                ' Set formatter "%s" from module "%s" for event "%s" and profile "%s"',
+                formatter_class_name,
+                module_name,
+                formatter_instance_.event_name,
+                formatter_instance_.profile_name,
+            )
+        else:
+            self.logger.error(
+                'Formatter class name must have the same name than filename in "%s"',
+                formatter,
+            )
 
     def __dump_existing_formatters(self):  # pragma: no cover
         """

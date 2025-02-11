@@ -136,24 +136,27 @@ class ProfileFormattersBrokerTests(unittest.TestCase):
                         formatter_content
                         % {
                             "formatter_class": formatter_class,
-                            "event_name": "test.event.%s" % app_name
-                            if event_name is None
-                            else event_name,
+                            "event_name": (
+                                "test.event.%s" % app_name
+                                if event_name is None
+                                else event_name
+                            ),
                         }
                     )
         # inject fake apps root dir to import path
         sys.path.append(os.path.join(os.getcwd(), self.MODULES_DIR))
 
         # overwrite module paths
-        # self.p.MODULES_DIR = '../../tests/libs/internals/%s' % self.MODULES_DIR
         self.p.MODULES_DIR = self.MODULES_DIR
-        self.p.PYTHON_CLEEP_IMPORT_PATH = ""
+        self.p.PYTHON_CLEEP_MODULES_IMPORT_PATH = ""
 
     def test_configure_with_formatters(self):
         self._init_context()
         self.p.configure(self.bootstrap)
+
         formatters = self.p._ProfileFormattersBroker__existing_formatters
         logging.debug("Loaded formatters=%s" % formatters)
+
         self.assertEqual(len(formatters.keys()), 2)
         self.assertTrue("test.event.app1" in formatters.keys())
         self.assertTrue("test.event.app2" in formatters.keys())
@@ -161,18 +164,21 @@ class ProfileFormattersBrokerTests(unittest.TestCase):
     def test_configure_without_formatters(self):
         self._init_context(add_apps=False)
         self.p.configure(self.bootstrap)
+
         formatters = self.p._ProfileFormattersBroker__existing_formatters
+
         self.assertEqual(len(formatters.keys()), 0)
 
     def test_enable_debug(self):
         e = profileformattersbroker.ProfileFormattersBroker(debug_enabled=True)
+
         self.assertEqual(e.logger.getEffectiveLevel(), logging.DEBUG)
         # restore original log level
         e.logger.setLevel(logging.getLogger().getEffectiveLevel())
 
     def test_invalid_modules_path(self):
         self.p.MODULES_DIR = "dummy"
-        self.p.PYTHON_CLEEP_IMPORT_PATH = ""
+        self.p.PYTHON_CLEEP_MODULES_IMPORT_PATH = ""
 
         with self.assertRaises(Exception) as cm:
             self.p.configure(self.bootstrap)
@@ -182,13 +188,17 @@ class ProfileFormattersBrokerTests(unittest.TestCase):
         self._init_context(formatter_content=FORMATTER_CONTENT_INVALID_CLASSNAME)
         self.p.configure(self.bootstrap)
 
-        self.assertEqual(len(self.p.get_renderers_formatters("test.event.app1")), 0)
+        result = self.p.get_renderers_formatters("test.event.app1")
+
+        self.assertEqual(len(result), 0)
 
     def test_load_formatters_invalid_syntax(self):
         self._init_context(formatter_content=FORMATTER_CONTENT_SYNTAX_ERROR)
         self.p.configure(self.bootstrap)
 
-        self.assertEqual(len(self.p.get_renderers_formatters("test.event.app1")), 0)
+        result = self.p.get_renderers_formatters("test.event.app1")
+
+        self.assertEqual(len(result), 0)
 
     def test_register_renderer(self):
         self._init_context(event_name="test.event.app1")
@@ -225,6 +235,7 @@ class ProfileFormattersBrokerTests(unittest.TestCase):
         self.p.configure(self.bootstrap)
 
         self.p.register_renderer("app1", [DummyProfile])
+
         formatters = self.p.get_renderers_formatters("test.event.dummy")
         logging.debug("Formatters: %s" % formatters)
         self.assertEqual(formatters, {})
@@ -284,6 +295,7 @@ class ProfileFormattersBrokerTests(unittest.TestCase):
     def test_register_renderer_best_in_core(self):
         self._init_context(event_name="test.event.test", add_apps=["app1", "app3"])
         self.p.configure(self.bootstrap)
+
         self.p.register_renderer("app2", [DummyProfile])
 
         logging.debug(self.p._ProfileFormattersBroker__formatters)
@@ -338,6 +350,7 @@ class ProfileFormattersBrokerTests(unittest.TestCase):
 
         profiles = self.p.get_renderers_profiles()
         logging.debug("Renderers profiles: %s" % profiles)
+
         self.assertEqual(len(profiles), 1)
         self.assertEqual(list(profiles.keys())[0], "app1")
         self.assertEqual(list(profiles.values())[0][0], "DummyProfile")
@@ -350,6 +363,7 @@ class ProfileFormattersBrokerTests(unittest.TestCase):
 
         renderers = self.p.get_renderers()
         logging.debug("Renderers: %s" % renderers)
+
         self.assertEqual(len(renderers), 2)
         self.assertTrue("app1" in renderers)
         self.assertTrue("app2" in renderers)
