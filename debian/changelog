@@ -6,6 +6,7 @@ cleep (1.0.0) unstable; urgency=low
   * Updated tests: move AnyArg and PatternArg from session to common
   * Added core: add funcs to register/unregister access point urls
   * Fixed core: fix cicheckdoc response output
+  * Added core: add systemctl lib
 
  -- Tanguy Bonneau <tanguy.bonneau@gmail.com>  Tue, 19 Nov 2024 11:00:00 +0100
 
