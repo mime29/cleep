@@ -98,22 +98,6 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
     };
 
     /**
-     * Sync to object updating source with specified update data.
-     * This function keep source memory address
-     */
-    self.__syncObject = function(source, update) {
-        // add/update existing items
-        Object.assign(source, update);
-
-        // delete non existing items from update
-        for (var key of Object.keys(source)) {
-            if (!(key in update)) {
-                delete source[key];
-            }
-        }
-    };
-
-    /**
      * Load js files
      * Use oclazyloader to inject automatically angular stuff
      * @param jsFiles: list of js files (with full path)
@@ -432,16 +416,16 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
     /**
      * Get list of installable modules
      */
-    self.getInstallableModules = function() {
+    self.getInstallableModules = function(forceRefresh=false) {
         var deferred = $q.defer();
 
-        if (Object.keys(self.installableModules).length > 0) {
+        if (Object.keys(self.installableModules).length > 0 && !forceRefresh) {
             deferred.resolve(self.installableModules);
         } else {
             // installable modules not loaded, load it
             rpcService.getModules(true)
                 .then(function(resp) {
-                    self.__syncObject(self.installableModules, resp.data);
+                    self.installableModules = resp.data;
                 }, function() {
                     deferred.reject();
                 });
@@ -458,7 +442,7 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
         return rpcService.sendCommand('get_modules_updates', 'update')
             .then(function(resp) {
                 if(!resp.error) {
-                    self.__syncObject(self.modulesUpdates, resp.data);
+                    self.modulesUpdates = resp.data;
                 }
             });
     };
@@ -750,7 +734,7 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
 		// refresh list of installable apps
         rpcService.getModules(true)
             .then(function(resp) {
-                self.__syncObject(self.installableModules, resp.data);
+                self.installableModules = resp.data;
             }, function() {
                 deferred.reject();
             });

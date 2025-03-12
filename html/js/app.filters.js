@@ -42,7 +42,7 @@ Cleep.filter('deviceType', function($filter) {
  */
 Cleep.filter('filterDeviceByModule', function($filter) {
     return function(devices, module) {
-        if( module ) {
+        if (module) {
             return $filter("filter")(devices, function(device) {
                 return device.module === module;
             });
@@ -73,7 +73,7 @@ Cleep.filter('hrTime', function($filter) {
         if (angular.isUndefined(ts) || !ts) {
             return '-';
         }
-        if( !angular.isUndefined(withSeconds) ) {
+        if (!angular.isUndefined(withSeconds)) {
             return moment.unix(ts).format('HH:mm:ss');
         }
         return moment.unix(ts).format('HH:mm');

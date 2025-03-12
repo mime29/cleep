@@ -49,14 +49,11 @@ var installDirective = function($q, cleepService, toast, $mdDialog, $sce) {
                     const modules = [];
                     for (const module of Object.values(cleepService.installableModules)) {
                         // fix module country alpha code
-                        var countryAlpha = module.country;
-                        if( countryAlpha===null || countryAlpha===undefined ) {
-                            countryAlpha = '';
-                        }
+                        const countryAlpha = module.country || '';
 
                         // append module if necessary
                         if ((!module.installed || (module.installed && module.library)) &&
-                            (countryAlpha.length===0 || countryAlpha.toUpperCase()==parametersConfig.country.alpha2) ) {
+                            (countryAlpha.length === 0 || countryAlpha.toUpperCase() === parametersConfig.country.alpha2) ) {
                             modules.push(module);
                         }
                     }
@@ -152,7 +149,7 @@ var installDirective = function($q, cleepService, toast, $mdDialog, $sce) {
          */
         self.$onInit = function() {
             // load mandatory data
-            cleepService.getInstallableModules();
+            cleepService.getInstallableModules(true);
             cleepService.refreshModulesUpdates();
         };
 
