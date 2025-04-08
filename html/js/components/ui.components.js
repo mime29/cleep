@@ -1,3 +1,5 @@
+/*global angular*/
+
 angular.module('Cleep').component('clIcon', {
     template: `
         <md-icon ng-if="$ctrl.clTooltip" md-font-icon="{{ $ctrl.mdFontIcon }}" ng-class="$ctrl.clClass">

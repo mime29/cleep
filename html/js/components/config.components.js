@@ -1,3 +1,5 @@
+/*global angular*/
+
 function getFormName() {
     return 'form' + Math.round(Math.random() * 100000000);
 }

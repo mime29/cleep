@@ -1,3 +1,5 @@
+/*global angular*/
+
 /**
  * Confirm dialog service
  * Used to open a material confirm dialog

@@ -1,3 +1,5 @@
+/*global angular*/
+
 /**
  * Configuration directive
  * Handle all module configuration

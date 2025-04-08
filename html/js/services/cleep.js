@@ -1,3 +1,5 @@
+/*global angular*/
+
 /**
  * Cleep services
  * Handles :

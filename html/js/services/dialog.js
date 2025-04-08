@@ -1,3 +1,5 @@
+/*global angular*/
+
 /**
  * Dialog service
  * Used to open a material dialog

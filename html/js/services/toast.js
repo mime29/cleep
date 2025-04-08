@@ -1,3 +1,5 @@
+/*global angular*/
+
 angular
 .module('Cleep')
 .service('toastService', ['$mdToast', '$mdDialog',

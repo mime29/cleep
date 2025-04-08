@@ -1,3 +1,5 @@
+/*global angular*/
+
 angular.module('Cleep').component('widgetBasic', {
     transclude: {
         content: '?widgetContent',

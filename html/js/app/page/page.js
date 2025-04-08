@@ -1,8 +1,9 @@
-/**
- * Page directive
- * Handle module extra pages
- */
-var pageDirective = function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templateCache, $http) {
+/*global angular*/
+
+angular
+.module('Cleep')
+.directive('pageDirective', ['$q', 'cleepService', '$compile', '$timeout', '$routeParams', '$ocLazyLoad', '$templateCache', '$http',
+function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templateCache, $http) {
 
     var pageController = ['$scope','$element', function($scope, $element) {
         var self = this;
@@ -197,8 +198,4 @@ var pageDirective = function($q, cleepService, $compile, $timeout, $routeParams,
         controllerAs: 'pageCtl',
         link: pageLink
     };
-};
-
-var Cleep = angular.module('Cleep');
-Cleep.directive('pageDirective', ['$q', 'cleepService', '$compile', '$timeout', '$routeParams', '$ocLazyLoad', '$templateCache', '$http', pageDirective]);
-
+}]);

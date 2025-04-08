@@ -1,3 +1,5 @@
+/*global angular*/
+
 /**
  * RPC service is in charge :
  *  - to implements rpc commands (sendCommand, upload, download, ...),

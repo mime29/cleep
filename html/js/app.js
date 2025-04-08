@@ -1,3 +1,4 @@
+/*global angular*/
 /**
  * Main application
  */

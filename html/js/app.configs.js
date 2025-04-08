@@ -1,3 +1,4 @@
+/*global angular*/
 /**
  * Application modules configuration
  * This file configures:
