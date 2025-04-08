@@ -583,7 +583,7 @@ class Cleep(BusClient):
             InvalidParameter if one parameter has invalid type or value
         """
         for parameter in parameters:
-            self.logger.trace('Check parameter %s' % parameter)
+            self.logger.trace('Check parameter %s', parameter)
             # none
             if ('none' not in parameter or ('none' in parameter and not parameter['none'])) and parameter['value'] is None:
                 raise MissingParameter('Parameter "%s" is missing' % parameter['name'])
@@ -893,7 +893,7 @@ class CleepModule(Cleep):
         if 'name' not in data:
             data['name'] = 'noname'
         devices[device_uuid] = data
-        self.logger.trace('devices: %s' % devices)
+        self.logger.trace('devices: %s', devices)
 
         # save data
         if not self._update_config({'devices': devices}):
@@ -1388,7 +1388,7 @@ class CleepRenderer(CleepModule):
         except NotImplementedError:
             raise
         except:
-            self.logger.exception('Rendering profile "%s" failed (%s):' % (profile_name, profile_values))
+            self.logger.exception('Rendering profile "%s" failed (%s):', (profile_name, profile_values))
             return False
 
     def on_render(self, profile_name, profile_values): # pragma: no cover
