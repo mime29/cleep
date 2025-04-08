@@ -14,7 +14,7 @@ from threading import Lock
 from unittest.mock import Mock
 from cleep.bus import BusClient
 from cleep.exception import InvalidParameter, MissingParameter
-from cleep.common import ExecutionStep, CORE_MODULES, MessageResponse
+from cleep.common import ExecutionStep, CORE_MODULES, MessageResponse, RENDERERS
 from cleep.libs.internals.crashreport import CrashReport
 from cleep.libs.drivers.driver import Driver
 from cleep.libs.internals.cleepdoc import CleepDoc
@@ -37,6 +37,9 @@ class Cleep(BusClient):
     """
     CONFIG_DIR = '/etc/cleep/'
     MODULE_DEPS = []
+    DEFAULT_CONFIG = None
+    MODULE_CONFIG_FILE = None
+    MODULE_SENTRY_DSN = None
 
     def __init__(self, bootstrap, debug_enabled):
         """
@@ -92,7 +95,8 @@ class Cleep(BusClient):
             self.crash_report = bootstrap['crash_report']
 
             # add core module version to libs version
-            self.crash_report.add_module_version(self.__class__.__name__, getattr(self, 'MODULE_VERSION', '0.0.0'))
+            module_version = getattr(self, 'MODULE_VERSION', '0.0.0')
+            self.crash_report.add_module_version(self.__class__.__name__, module_version)
 
         elif bootstrap['test_mode']: # pragma: no cover
             self.logger.debug('Test mode: do not set crash report to module')
@@ -1331,6 +1335,10 @@ class CleepRenderer(CleepModule):
     And declare mathods:
         * on_render: implement this function to handle render event using profile parameters
     """
+
+    RENDERER_TYPE = RENDERERS.UNKNOWN
+    RENDERER_PROFILES = []
+
     def __init__(self, bootstrap, debug_enabled):
         """
         Constructor
@@ -1361,6 +1369,8 @@ class CleepRenderer(CleepModule):
         """
         if getattr(self, 'RENDERER_PROFILES', None) is None:
             raise Exception('RENDERER_PROFILES is not defined in "%s"' % self.__class__.__name__)
+        if not isinstance(self.RENDERER_PROFILES, list):
+            raise Exception('RENDERER_PROFILES must be a list in "%s"' % self.__class__.__name__)
 
         # cache profile types as string
         for profile in self.RENDERER_PROFILES:

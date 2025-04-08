@@ -120,7 +120,7 @@ class RpcServerTests(unittest.TestCase):
         if is_subscribed_return_value is not None:
             self.internal_bus.is_subscribed.return_value = is_subscribed_return_value
         if is_subscribed_side_effect is not None:
-            self.intrnal_bus.is_subscribed.side_effect = is_subscribed_side_effect
+            self.internal_bus.is_subscribed.side_effect = is_subscribed_side_effect
         self.bootstrap = {
             'internal_bus': None if no_bus else self.internal_bus,
             'cleep_filesystem': self.cleep_filesystem,

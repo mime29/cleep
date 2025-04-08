@@ -59,6 +59,8 @@ class RENDERERS(object):
     """
     Cleep renderer application types
     """
+    # UNKNOWN
+    UNKNOWN = 'UNKNOWN'
     # audio renderer
     AUDIO = 'AUDIO'
     # display renderer
@@ -67,6 +69,7 @@ class RENDERERS(object):
     HOMEAUTOMATION = 'HOMEAUTOMATION'
 
     ALL = [
+        'UNKNOWN',
         'AUDIO',
         'DISPLAY',
         'HOMEAUTOMATION',
