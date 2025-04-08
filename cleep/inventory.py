@@ -356,7 +356,7 @@ class Inventory(Cleep):
                     self.logger.exception('Core application "%s" exception:', module_name)
                     self.logger.error('Unable to load core application "%s". System will be instable', module_name)
                     self.crash_report.report_exception({
-                        'message': 'Unable to load core application "%s". System will be instable', module_name,
+                        'message': f'Unable to load core application "{module_name}". System will be instable',
                         'module_name': module_name
                     })
 

@@ -1388,7 +1388,7 @@ class CleepRenderer(CleepModule):
         except NotImplementedError:
             raise
         except:
-            self.logger.exception('Rendering profile "%s" failed (%s):', (profile_name, profile_values))
+            self.logger.exception('Rendering profile "%s" failed (%s):', profile_name, profile_values)
             return False
 
     def on_render(self, profile_name, profile_values): # pragma: no cover
