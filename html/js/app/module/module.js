@@ -9,8 +9,8 @@ angular
 .directive('moduleDirective', ['$q', 'cleepService', '$compile', '$timeout', '$routeParams', '$ocLazyLoad', '$templateCache', '$http',
 function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templateCache, $http) {
 
-    var moduleController = ['$scope','$element', function($scope, $element) {
-        var self = this;
+    const moduleController = ['$scope','$element', function($scope, $element) {
+        const self = this;
         self.modulesPath = 'js/modules/';
         self.module = '';
         self.label = '';
@@ -24,13 +24,12 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
          * @param module: module name
          */
         self.__getConfigFilesToLoad = function(desc, module) {
-            // init
-            var url = self.modulesPath + module + '/';
-            var files = {
+            const url = self.modulesPath + module + '/';
+            const files = {
                 'html': [],
                 'jscss': []
             };
-            var types = ['js', 'css', 'html'];
+            const types = ['js', 'css', 'html'];
 
             // check desc config
             if( !desc || !desc.config ) {
@@ -38,10 +37,10 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
             }
 
             // append files by types
-            for( var j=0; j<types.length; j++ ) {
-                if( desc.config[types[j]] ) {
-                    for( var i=0; i<desc.config[types[j]].length; i++) {
-                        if( types[j]=='html' ) {
+            for (const j=0; j<types.length; j++) {
+                if (desc.config[types[j]]) {
+                    for (const i=0; i<desc.config[types[j]].length; i++) {
+                        if (types[j]=='html') {
                             files['html'].push(url + desc.config[types[j]][i]);
                         } else {
                             files['jscss'].push(url + desc.config[types[j]][i]);
@@ -58,7 +57,6 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
          * @param files: list of js files
          */
         self.__loadJsCssFiles = function(files) {
-            // load js files using lazy loader
             return $ocLazyLoad.load({
                 'cache': false,
                 'reconfig': false,
@@ -71,30 +69,30 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
          * Load html files as templates
          * @param htmlFile: list of html files
          */
-        self.__loadHtmlFiles = function(htmlFiles) {
-            // init
-            var promises = [];
-            var d = $q.defer();
+        self.__loadHtmlFiles = function(modulePath, htmlFiles) {
+            const promises = [];
+            const d = $q.defer();
 
             // fill templates promises
-            for( var i=0; i<htmlFiles.length; i++ ) {
+            for (const htmlFile of htmlFiles) {
                 // load only missing templates
-                var templateName = htmlFiles[i].substring(htmlFiles[i].lastIndexOf('/')+1);
-                promises.push($http.get(htmlFiles[i]));
+                const templateName = htmlFile.replace(modulePath, '').split('?')[0];
+                if (!$templateCache.get(templateName)) {
+                    promises.push($http.get(htmlFile));
+                }
             }
 
             // and execute them
             $q.all(promises)
                 .then(function(templates) {
-                    // check if templates available
-                    if( !templates ) {
+                    if (!templates) {
                         return;
                     }
 
                     // cache templates
-                    for( var i=0; i<templates.length; i++ ) {
-                        var templateName = htmlFiles[i].substring(htmlFiles[i].lastIndexOf('/')+1);
-                        $templateCache.put(templateName, templates[i].data);
+                    for (const template of templates.values()) {
+                        const templateName = template.config?.url.replace(modulePath, '').split('?')[0];
+                        $templateCache.put(templateName, template.data);
                     }
                 }, function(err) {
                     console.error('Error occured loading html files:', err);
@@ -116,11 +114,11 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
         /**
          * Init controller
          */
-        self.init = function(module)
-        {
+        self.init = function(module) {
             // save module name
             self.module = module;
-            var files;
+            const modulePath = self.module + module + '/';
+            let files;
 
             // load module description
             cleepService.getModuleDescription(module)
@@ -128,7 +126,7 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
                     files = self.__getConfigFilesToLoad(desc, module);
 
                     // load html templates first
-                    return self.__loadHtmlFiles(files.html);
+                    return self.__loadHtmlFiles(modulePath, files.html);
 
                 }, function(err) {
                     self.error = true;
@@ -148,8 +146,8 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
                 })
                 .then(function() {
                     // everything is loaded successfully, inject module component
-                    var template = '<div ' + module + '-config-component=""></div>';
-                    var component = $compile(template)($scope);
+                    const template = '<div ' + module + '-config-component=""></div>';
+                    const component = $compile(template)($scope);
                     $element.append(component);
 
                     // save usefull infos
@@ -166,7 +164,7 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
         };
     }];
 
-    var moduleLink = function(scope, element, attrs, controller) {
+    const moduleLink = function(scope, element, attrs, controller) {
         controller.init($routeParams.name);
     };
 

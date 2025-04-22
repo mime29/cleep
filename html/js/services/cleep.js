@@ -11,7 +11,7 @@ angular
 .service('cleepService', ['$injector', '$q', 'toastService', 'rpcService', '$http', '$ocLazyLoad', '$templateCache', '$rootScope',
 function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $rootScope) {
 
-    var self = this;
+    const self = this;
     self.__deferredModules = $q.defer();
     self.__deferredEvents = $q.defer();
     self.__deferredRenderers = $q.defer();
@@ -30,7 +30,7 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * Load Cleep config
      */
     self.loadConfig = function() {
-        var config;
+        let config;
 
         return rpcService.getConfig()
             .then(function(resp) {
@@ -68,8 +68,7 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * @return object { js:[], html:[] }
      */
     self.__getModuleGlobalFiles = function(module, desc) {
-        // init
-        var files = {
+        const files = {
             'js': [],
             'html': [],
             'css': []
@@ -81,18 +80,18 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
 
         // get global files
         if (desc.global && desc.global.js) {
-            for (var i=0; i<desc.global.js.length; i++) {
-                files.js.push(self.modulesPath + module + '/' + desc.global.js[i]);
+            for (const globalJs of desc.global.js) {
+                files.js.push(self.modulesPath + module + '/' + globalJs);
             }
         }
         if (desc.global && desc.global.html) {
-            for (var i=0; i<desc.global.html.length; i++) {
-                files.html.push(self.modulesPath + module + '/' + desc.global.html[i]);
+            for (const globalHtml of desc.global.html) {
+                files.html.push(self.modulesPath + module + '/' + globalHtml);
             }
         }
         if (desc.global && desc.global.css) {
-            for (var i=0; i<desc.global.css.length; i++) {
-                files.css.push(self.modulesPath + module + '/' + desc.global.css[i]);
+            for (const globalCss of desc.global.css) {
+                files.css.push(self.modulesPath + module + '/' + globalCss);
             }
         }
 
@@ -135,27 +134,29 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * @return promise
      */
     self.__loadHtmlFiles = function(modulePath, htmlFiles) {
-        // init
-        var promises = [];
-        var d = $q.defer();
+        const promises = [];
+        const d = $q.defer();
 
         // fill templates promises
-        for (var i=0; i < htmlFiles.length; i++) {
-            promises.push($http.get(htmlFiles[i]));
+        for (const htmlFile of htmlFiles) {
+            // load only missing templates
+            const templateName = htmlFile.replace(modulePath, '').split('?')[0];
+            if (!$templateCache.get(templateName)) {
+                promises.push($http.get(htmlFile));
+            }
         }
 
         // and execute them
         $q.all(promises)
             .then(function(templates) {
-                // check if templates available
                 if (!templates) {
                     return $q.resolve();
                 }
 
                 // cache templates
-                for (var i=0; i < templates.length; i++) {
-                    var templateName = htmlFiles[i].replace(modulePath, '');
-                    $templateCache.put(templateName, templates[i].data);
+                for (const template of templates.values()) {
+                    const templateName = template.config?.url.replace(modulePath, '').split('?')[0];
+                    $templateCache.put(templateName, template.data);
                 }
             }, function(err) {
                 console.error('Error occured loading html files:', err);
@@ -181,12 +182,11 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * @return promise
      */
     self.__loadModule = function(module) {
-        // init
-        var modulePath = self.modulesPath + module + '/';
-        var url = modulePath + 'desc.json';
-        var desc = null;
-        var d = $q.defer();
-        var files = null;
+        const modulePath = self.modulesPath + module + '/';
+        const url = modulePath + 'desc.json';
+        let desc = null;
+        const d = $q.defer();
+        let files = null;
 
         // do not load data of modules with pending status
         if (self.modulesUpdates[module] && self.modulesUpdates[module].pending) {
@@ -249,10 +249,10 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
             })
             .then(function() {
                 // force getting service from injector to make them executed as soon as possible
-                for (var i=0; i<files.js.length; i++) {
-                    if (files.js[i].indexOf('service') >= 0) {
+                for (const fileJs of files.js) {
+                    if (fileJs.indexOf('service') >= 0) {
                         // guess service name from filename
-                        serviceName = files.js[i].replace(/^.*[\\\/]/, '');
+                        serviceName = fileJs.replace(/^.*[\\\/]/, '');
                         serviceName = serviceName.replace('.js', '');
                         serviceName = self.__camelize(serviceName);
 
@@ -290,8 +290,7 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * @return promise<json|null>
      */
     self.getModuleDescription = function(module) {
-        // init
-        var deferred = $q.defer();
+        const deferred = $q.defer();
 
         if (self.__deferredModules === null) {
             // module config already loaded, resolve it if available
@@ -328,10 +327,10 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
         self.modules = modules;
 
         // load description for each local modules
-        var promises = [];
-        for (module in self.modules) {
-            if ((self.modules[module].installed && self.modules[module].started) || self.modules[module].library) {
-                promises.push(self.__loadModule(module));
+        const promises = [];
+        for (const module of Object.values(self.modules)) {
+            if (module.installed && module.started || module.library) {
+                promises.push(self.__loadModule(module.name));
             }
         }
 
@@ -358,7 +357,7 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * @return promise: promise is resolved when configuration is loaded
      */
     self.getModuleConfig = function(module) {
-        var deferred = $q.defer();
+        const deferred = $q.defer();
 
         if (self.__deferredModules === null) {
             // module config already loaded, resolve it if available
@@ -387,7 +386,7 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * @return promise
      */
     self.reloadModuleConfig = function(module) {
-        var deferred = $q.defer();
+        const deferred = $q.defer();
 
         if (self.modules[module]) {
             rpcService.sendCommand('get_module_config', module, null, 30)
@@ -419,7 +418,7 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * Get list of installable modules
      */
     self.getInstallableModules = function(forceRefresh=false) {
-        var deferred = $q.defer();
+        const deferred = $q.defer();
 
         if (Object.keys(self.installableModules).length > 0 && !forceRefresh) {
             deferred.resolve(self.installableModules);
@@ -454,10 +453,10 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * Prepare dashboard widgets and init device using associated module
      */
     self._setDevices = function(devices) {
-        var newDevices = [];
-        for (var module in devices) {
+        const newDevices = [];
+        for (module in devices) {
             // add specific ui stuff
-            for (var uuid in devices[module]) {
+            for (const uuid in devices[module]) {
                 // add module which handles this device
                 devices[module][uuid].module = module;
 
@@ -467,7 +466,7 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
             }
 
             // store device
-            for (var uuid in devices[module]) {
+            for (const uuid in devices[module]) {
                 newDevices.push(devices[module][uuid]);
             }
         }
@@ -480,7 +479,7 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * Call getDevices command again and set devices
      */
     self.reloadDevices = function() {
-        var deferred = $q.defer();
+        const deferred = $q.defer();
 
         rpcService.getDevices()
             .then(function(resp) {
@@ -518,7 +517,7 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * @return promise
      */
     self.getRenderers = function() {
-        var deferred = $q.defer();
+        const deferred = $q.defer();
 
         if (self.__deferredRenderers === null) {
             // renderers already loaded, return collection
@@ -553,7 +552,7 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * @return promise
      */
     self.getEvents = function() {
-        var deferred = $q.defer();
+        const deferred = $q.defer();
 
         if (self.__deferredEvents === null) {
             // events already loaded, return collection
@@ -588,7 +587,7 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * @return promise
      */
     self.getDrivers = function() {
-        var deferred = $q.defer();
+        const deferred = $q.defer();
 
         if (self.__deferredDrivers === null) {
             // drivers already loaded, return collection
@@ -610,7 +609,7 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * Call getDrivers command again and set drivers
      */
     self.reloadDrivers = function() {
-        var deferred = $q.defer();
+        const deferred = $q.defer();
 
         rpcService.getDrivers()
             .then(function(resp) {
@@ -629,7 +628,7 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * @return true if module is loaded, false otherwise
      */
     self.isAppInstalled = function(app) {
-        for (var name in self.modules) {
+        for (const name in self.modules) {
             if (name === app && self.modules[name].installed) {
                 return true;
             }

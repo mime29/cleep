@@ -11,7 +11,7 @@ var Cleep = angular.module('Cleep');
  */
 Cleep.filter('capitalize', function() {
     return function(str) {
-        return (!!str) ? str.charAt(0).toUpperCase() + str.substring(1).toLowerCase() : '';
+        return Boolean(str) ? str.charAt(0).toUpperCase() + str.substring(1).toLowerCase() : '';
     };
 });
 
@@ -21,7 +21,7 @@ Cleep.filter('capitalize', function() {
 Cleep.filter('serviceName', function() {
     return function(str) {
         var tmp = str.replace('Service','');
-        return (!!tmp) ? tmp.charAt(0).toUpperCase() + tmp.substring(1).toLowerCase() : '';
+        return Boolean(tmp) ? tmp.charAt(0).toUpperCase() + tmp.substring(1).toLowerCase() : '';
     };
 });
 

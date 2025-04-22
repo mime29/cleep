@@ -5,8 +5,8 @@ angular
 .directive('pageDirective', ['$q', 'cleepService', '$compile', '$timeout', '$routeParams', '$ocLazyLoad', '$templateCache', '$http',
 function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templateCache, $http) {
 
-    var pageController = ['$scope','$element', function($scope, $element) {
-        var self = this;
+    const pageController = ['$scope','$element', function($scope, $element) {
+        const self = this;
         self.modulesPath = 'js/modules/';
         self.module = '';
         self.page = '';
@@ -46,13 +46,12 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
          * @param page: page name
          */
         self.__getPageFilesToLoad = function(desc, module, page) {
-            // init
-            var url = self.modulesPath + module + '/';
-            var files = {
+            const url = self.modulesPath + module + '/';
+            const files = {
                 'html': [],
                 'jscss': []
             };
-            var types = ['js', 'css', 'html'];
+            const types = ['js', 'css', 'html'];
 
             // check desc content
             const pageDesc = desc?.pages?.[self.page];
@@ -97,34 +96,33 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
 
         /**
          * Load html files as templates
+         * @param modulePath: base path of currently loaded module
          * @param htmlFile: list of html files
          */
-        self.__loadHtmlFiles = function(htmlFiles) {
-            // init
-            var promises = [];
-            var d = $q.defer();
+        self.__loadHtmlFiles = function(modulePath, htmlFiles) {
+            const promises = [];
+            const d = $q.defer();
 
             // fill templates promises
-            for (var i=0; i<htmlFiles.length; i++) {
+            for (const htmlFile of htmlFiles) {
                 // load only missing templates
-                var templateName = htmlFiles[i].substring(htmlFiles[i].lastIndexOf('/')+1);
+                const templateName = htmlFile.replace(modulePath, '').split('?')[0];
                 if (!$templateCache.get(templateName)) {
-                    promises.push($http.get(htmlFiles[i]));
+                    promises.push($http.get(htmlFile));
                 }
             }
 
             // and execute them
             $q.all(promises)
                 .then(function(templates) {
-                    // check if templates available
                     if (!templates) {
                         return;
                     }
     
                     // cache templates
-                    for (var i=0; i<templates.length; i++) {
-                        var templateName = htmlFiles[i].substring(htmlFiles[i].lastIndexOf('/')+1);
-                        $templateCache.put(templateName, templates[i].data);
+                    for (const template of templates.values()) {
+                        const templateName = template.config?.url.replace(modulePath, '').split('?')[0];
+                        $templateCache.put(templateName, template.data);
                     }
                 }, function(err) {
                     console.error('Error occured loading html files:', err);
@@ -145,7 +143,8 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
             // save module name
             self.module = module;
             self.page = page;
-            var files;
+            let files;
+            const modulePath = self.modulesPath + module + '/';
 
             // load module description
             cleepService.getModuleDescription(module)
@@ -156,7 +155,7 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
                     }
 
                     // load html templates first
-                    return self.__loadHtmlFiles(files.html);
+                    return self.__loadHtmlFiles(modulePath, files.html);
 
                 }, function(err) {
                     console.error('Unable to get module "' + module + '" description');
@@ -175,8 +174,8 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
                 })
                 .then(function() {
                     // everything is loaded successfully, inject page directive
-                    var template = '<div ' + page.toKebab() + '-page-directive=""></div>';
-                    var directive = $compile(template)($scope);
+                    const template = '<div ' + page.toKebab() + '-page-directive=""></div>';
+                    const directive = $compile(template)($scope);
                     $element.append(directive);
 
                 }, function(err) {
@@ -187,7 +186,7 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
         };
     }];
 
-    var pageLink = function(scope, element, attrs, controller) {
+    const pageLink = function(scope, element, attrs, controller) {
         controller.init($routeParams.name, $routeParams.page);
     };
 
