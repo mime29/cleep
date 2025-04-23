@@ -117,7 +117,7 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
         self.init = function(module) {
             // save module name
             self.module = module;
-            const modulePath = self.module + module + '/';
+            const modulePath = self.modulesPath + module + '/';
             let files;
 
             // load module description
@@ -127,7 +127,6 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
 
                     // load html templates first
                     return self.__loadHtmlFiles(modulePath, files.html);
-
                 }, function(err) {
                     self.error = true;
                     console.error('Unable to get module "' + module + '" description');
