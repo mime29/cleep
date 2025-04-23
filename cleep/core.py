@@ -593,7 +593,7 @@ class Cleep(BusClient):
                 raise MissingParameter('Parameter "%s" is missing' % parameter['name'])
             if parameter['value'] is None:
                 # nothing else to check, parameter value is allowed as None
-                return
+                continue
 
             # type
             if not isinstance(parameter['value'], parameter.get('type', str)):
