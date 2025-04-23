@@ -37,9 +37,9 @@ function($q, cleepService, $compile, $timeout, $routeParams, $ocLazyLoad, $templ
             }
 
             // append files by types
-            for (const j=0; j<types.length; j++) {
+            for (let j=0; j<types.length; j++) {
                 if (desc.config[types[j]]) {
-                    for (const i=0; i<desc.config[types[j]].length; i++) {
+                    for (let i=0; i<desc.config[types[j]].length; i++) {
                         if (types[j]=='html') {
                             files['html'].push(url + desc.config[types[j]][i]);
                         } else {
