@@ -731,9 +731,9 @@ angular.module('Cleep').component('configSelect', {
         ctrl.selectAll = function () {
             const selectableOptions = ctrl.options.filter((option) => !option.disabled);
             const fill = ctrl.clModel?.length !== selectableOptions.length;
-            ctrl.clModel.splice(0, ctrl.clModel.length);
+            ctrl.clModel?.splice(0, ctrl.clModel.length);
             if (fill) {
-                selectableOptions.forEach((option) => ctrl.clModel.push(option.value));
+                selectableOptions.forEach((option) => ctrl.clModel?.push(option.value));
             }
         };
 
