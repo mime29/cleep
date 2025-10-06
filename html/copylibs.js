@@ -9,6 +9,11 @@ const path = require('path');
     }
 );*/
 
+// HOWTO
+// Update package.json to update dependencies
+// Launch npm install
+// Run this script to get copy of node_modules/xxx dependencies in js/css/fonts Cleep html folder
+
 var files = {
     // angularjs
     'node_modules/angular/angular.min.js': 'js/libs/angular.min.js',
