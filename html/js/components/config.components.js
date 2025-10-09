@@ -135,7 +135,7 @@ angular.module('Cleep').component('configBasic', {
                     </div>
                 </form>
             </div>
-            <div ng-if="$ctrl.noForm" flex layout="row" layout-align="end center">
+            <div ng-if="$ctrl.noForm" flex layout="row" layout-align="end center" style="padding-right: 15px;">
                 <ng-transclude flex layout="row" layout-align="end center"></ng-transclude>
 
                 <config-item-save-button
@@ -654,8 +654,8 @@ angular.module('Cleep').component('configSelect', {
                     </md-option>
                 </md-select>
                 <md-select ng-if="!$ctrl.isMultiple" name="inputField" ng-required="$ctrl.clRequired" ng-model="$ctrl.clModel" ng-disabled="$ctrl.clDisabled" ng-change="$ctrl.onChange()">
-                    <md-option ng-if="$ctrl.clEmpty" value="">
-                        <em>{{ $ctrl.clEmpty }}</em>
+                    <md-option ng-if="$ctrl.displayEmpty" value="">
+                        <em>{{ $ctrl.empty }}</em>
                     </md-option>
                     <md-option ng-repeat="option in $ctrl.options track by $index" ng-value="option.value" ng-disabled="option.disabled">
                         {{ option.label }}
@@ -692,6 +692,8 @@ angular.module('Cleep').component('configSelect', {
         ctrl.options = [];
         ctrl.isMultiple = false;
         ctrl.showSelectAll = false;
+        ctrl.displayEmpty = false;
+        ctrl.empty = '';
 
         ctrl.$onInit = function () {
             ctrl.isMultiple = angular.isArray(ctrl.clModel);
@@ -700,11 +702,14 @@ angular.module('Cleep').component('configSelect', {
 
         ctrl.$onChanges = function (changes) {
             if (changes.clOptions?.currentValue) {
-                ctrl.prepareOptions(changes.clOptions.currentValue);
+                ctrl.setOptions(changes.clOptions.currentValue);
+            }
+            if (changes.clEmpty?.currentValue) {
+                ctrl.setDisplayEmpty();
             }
         };
 
-        ctrl.prepareOptions = function (options) {
+        ctrl.setOptions = function (options) {
             const firstOption = options[0];
 
             if (!angular.isObject(firstOption)) {
@@ -726,6 +731,12 @@ angular.module('Cleep').component('configSelect', {
                     });
                 }
             }
+            ctrl.setDisplayEmpty();
+        };
+
+        ctrl.setDisplayEmpty = function () {
+            ctrl.empty = ctrl.clEmpty ?? 'No item in list';
+            ctrl.displayEmpty = ctrl.empty.length !== 0 && ctrl.options.length === 0;
         };
 
         ctrl.selectAll = function () {
