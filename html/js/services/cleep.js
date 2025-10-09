@@ -496,7 +496,17 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * Return module devices
      */
     self.getModuleDevices = function(module) {
-        return self.devices.filter(device => device.module === module);
+        return self.devices.filter((device) => device.module === module);
+    };
+    self.getDevices = function(app) {
+        return self.devices.filter((device) => device.module === module);
+    };
+
+    /**
+     * Return device by uuid
+     */
+    self.getDevice = function(uuid) {
+        return self.devices.find((device) => device.uuid === uuid);
     };
 
     /**
