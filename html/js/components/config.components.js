@@ -1253,3 +1253,74 @@ angular.module('Cleep').component('configFile', {
         };
     },
 });
+
+angular.module('Cleep').component('configTabs', {
+    transclude: true,
+    template: `
+        <md-nav-bar md-selected-nav-item="$ctrl.selectedTab">
+            <md-nav-item ng-repeat="tab in $ctrl.tabs track by $index" name="{{ tab.id }}" md-nav-sref="{{ tab.id }}">
+                {{ tab.label }}
+            </md-nav-item>
+        </md-nav-bar>
+        <ng-transclude id="clTabContent"></ng-transclude>
+    `,
+    bindings: {
+        clTabs: '<',
+        clSelectedTab: '@',
+    },
+    controller: function ($compile) {
+        const ctrl = this;
+        ctrl.selectedTab = undefined;
+        ctrl.tabs = [];
+        ctrl.tabContentDivs = [];
+
+        ctrl.$postLink = function () {
+            const tabContentDivs = document.getElementById('clTabContent');
+            for (const tabContentDiv of tabContentDivs.children) {
+                const div = angular.element(tabContentDiv);
+
+                const tabId = div.attr('id');
+                const tabData = ctrl.getTabDataById(tabId);
+                if (!tabData) {
+                    console.warn(`Tab with id ${tabId} has no data. Please check specified clTabs data`);
+                    continue;
+                }
+
+                const divScope = div.scope();
+                div.attr('ng-show', `$parent.$ctrl.selectedTab === '${tabId}'`);
+                $compile(div)(divScope);
+            }
+        };
+
+        ctrl.$onChanges = function (changes) {
+            if (changes.clTabs?.currentValue !== undefined) {
+                ctrl.updateTabs(changes.clTabs.currentValue);
+            }
+            if (changes.clSelectedTab?.currentValue !== undefined) {
+                const tabData = ctrl.getTabDataById(changes.clSelectedTab.currentValue);
+                if (tabData) {
+                    ctrl.selectedTab = tabData.id;
+                }
+            }
+        };
+
+        ctrl.getTabDataById = function(tabId) {
+            return ctrl.tabs.find((tab) => tab.id === tabId);
+        };
+
+        ctrl.updateTabs = function(tabs) {
+            if (!tabs?.length) {
+                console.error('Please fill clTabs in configTab component');
+                return;
+            }
+
+            ctrl.tabs.splice(0, ctrl.tabs.length);
+            for (const tab of tabs) {
+                ctrl.tabs.push(tab);
+            }
+            ctrl.selectedTab = ctrl.tabs[0].id;
+        };
+    },
+
+
+});
