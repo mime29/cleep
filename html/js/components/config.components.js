@@ -1068,7 +1068,7 @@ angular.module('Cleep').component('configList', {
             }
         };
 
-        ctrl.onSelect = (index) => {
+        ctrl.onSelect = function (index) {
             const data = {
                 value: ctrl.selected[index],
                 current: ctrl.clItems[index],
@@ -1078,7 +1078,7 @@ angular.module('Cleep').component('configList', {
             (ctrl.clOnSelect || angular.noop)(data);
         };
 
-        ctrl.onClick = ($event, click, item, index) => {
+        ctrl.onClick = function ($event, click, item, index) {
             const data = {
                 item,
                 index,

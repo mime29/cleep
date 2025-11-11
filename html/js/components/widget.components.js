@@ -297,7 +297,7 @@ angular.module('Cleep').component('widgetConf', {
             ctrl.getTextFooterItem = function (footer) {
                 const filterStr = footer.filter ? ' | ' + footer.filter : '';
                 const unitStr = footer.unit || '';
-                const attrStr = footer.attr ? '{{ device.' + footer.attr + filterStr + ' }}' + unitStr : '';
+                const attrStr = footer.attr ? '{{ device.' + footer.attr + filterStr + ' }}' + unitStr : undefined || footer.label
 
                 return {
                     type: 'text',

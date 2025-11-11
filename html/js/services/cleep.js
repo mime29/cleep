@@ -453,7 +453,7 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
      * Prepare dashboard widgets and init device using associated module
      */
     self._setDevices = function(devices) {
-        const newDevices = [];
+        self.devices.splice(0, self.devices.length);
         for (module in devices) {
             // add specific ui stuff
             for (const uuid in devices[module]) {
@@ -467,11 +467,9 @@ function($injector, $q, toast, rpcService, $http, $ocLazyLoad, $templateCache, $
 
             // store device
             for (const uuid in devices[module]) {
-                newDevices.push(devices[module][uuid]);
+                self.devices.push(devices[module][uuid]);
             }
         }
-
-        self.devices = newDevices;
     };
 
     /**

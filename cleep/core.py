@@ -10,6 +10,7 @@ import os
 from gevent import sleep
 import copy
 import uuid
+import time
 from threading import Lock
 from unittest.mock import Mock
 from cleep.bus import BusClient
@@ -897,6 +898,7 @@ class CleepModule(Cleep):
         if 'name' not in data:
             data['name'] = 'noname'
         devices[device_uuid] = data
+        data['update'] = int(time.time())
         self.logger.trace('devices: %s', devices)
 
         # save data
@@ -960,6 +962,7 @@ class CleepModule(Cleep):
 
         # always force uuid to make sure data is always valid
         data_['uuid'] = device_uuid
+        data_['update'] = int(time.time())
 
         # update data
         devices[device_uuid].update({k: v for k, v in data_.items() if k in devices[device_uuid].keys()})
