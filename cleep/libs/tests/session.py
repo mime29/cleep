@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from gevent import monkey
 monkey.patch_all()
-from cleep.libs.internals.crashreport import CrashReport
 from cleep.libs.internals.eventsbroker import EventsBroker
 from cleep.libs.internals.profileformattersbroker import ProfileFormattersBroker
 from cleep.libs.internals.cleepfilesystem import CleepFilesystem

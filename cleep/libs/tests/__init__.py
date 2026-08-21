@@ -1,3 +1,6 @@
+from gevent import monkey
+monkey.patch_all()
+
 from os.path import dirname, basename, isfile, join
 import glob
 
