@@ -1,5 +1,7 @@
 bottle==0.12.25
 gevent @ https://github.com/CleepDevice/cleep-libs-prebuild/raw/main/gevent/bullseye/gevent-22.10.2-cp39-cp39-linux_armv7l.whl
+zope.interface<8
+zope.event==5.0
 greenlet==2.0.2
 netifaces2==0.0.21
 passlib==1.7.4
