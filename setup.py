@@ -5,11 +5,13 @@ from setuptools import setup, find_packages
  
 import cleep
 
+# Keep cleep.libs.tests (app test helpers); exclude only unit-test tree + modules
 exclude = [
-    "*tests*",
-    "modules"
+    "modules",
+    "cleep.tests",
+    "cleep.tests.*",
 ]
- 
+
 setup(
     name = 'cleep',
     version = cleep.__version__,
@@ -21,10 +23,10 @@ setup(
     install_requires = open('requirements.txt').readlines(),
     include_package_data = True,
     url = 'http://www.github.com/tangb/cleep',
+    license = 'GPL-3.0-or-later',
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
-        "Operating System :: POSIX :: Linux"
+        "Operating System :: POSIX :: Linux",
     ],
     python_requires='>=3.9',
 )

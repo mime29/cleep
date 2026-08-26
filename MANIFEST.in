@@ -1,6 +1,6 @@
 include *.md
 recursive-include cleep *.py
-recursive-exclude __pycache__ *.pyc *.pyo *.orig
+global-exclude *.pyc *.pyo *.orig
 prune cleep/tests
 recursive-include html *.*
 include bin/cleep

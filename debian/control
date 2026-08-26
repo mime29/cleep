@@ -8,7 +8,7 @@ Homepage: https://github.com/CleepDevice/cleep
 
 Package: cleep
 Architecture: armhf
-Depends: ${shlibs:Depends},${misc:Depends},${python3:Depends},__CLEEP_PACKAGES__
+Depends: ${misc:Depends},${python3:Depends},__CLEEP_PACKAGES__
 Description: Build your own IoT device easily.
  Cleep is a software that provides a way to build easily your own Iot device that fits your needs
  .
