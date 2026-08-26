@@ -1,8 +1,5 @@
 bottle==0.12.25
 gevent @ https://github.com/CleepDevice/cleep-libs-prebuild/raw/main/gevent/bullseye/gevent-22.10.2-cp39-cp39-linux_armv7l.whl
-# Required by gevent 22.10 monkey.patch_all() + Debian pkg_resources (not extras).
-# Pins: 8+ / 5.1+ are invisible to pkg_resources. Until a .deb from this file is
-# published, cleep-ci Dockerfile-cleep duplicates these pip installs.
 zope.interface<8
 zope.event==5.0
 greenlet==2.0.2
