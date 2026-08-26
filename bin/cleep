@@ -355,7 +355,7 @@ if __name__ == '__main__':
         readonly_enabled = True
         debug_modules = []
         log_stdout = False
-        dry_run = False
+        do_dry_run = False
         ci_doc_app_name = None
         ci_check_doc_app_name = None
         argv = sys.argv[1:]
@@ -375,15 +375,15 @@ if __name__ == '__main__':
             elif opt in ('-N', '--noro'):
                 readonly_enabled = False
             elif opt in ('-r', '--dryrun'):
-                dry_run = True
+                do_dry_run = True
             elif opt in ('-c', '--cidoc'):
                 ci_doc_app_name = arg
                 force_http = True
-                dry_run = True
+                do_dry_run = True
             elif opt in ('-C', '--cicheckdoc'):
                 ci_check_doc_app_name = arg
                 force_http = True
-                dry_run = True
+                do_dry_run = True
             elif opt in ('v', '--version'):
                 print(VERSION)
                 sys.exit(0)
@@ -484,7 +484,7 @@ if __name__ == '__main__':
 
         # wait for inventory starts all modules
         startup_succeed = inventory.wait_for_apps_started()
-        if dry_run and not startup_succeed:
+        if do_dry_run and not startup_succeed:
             raise Exception('Cleep starts with errors. Stop here')
         logger.info('Inventory is ready and all applications are loaded')
         logger.info('External bus is handled by "%s" application' % bootstrap['external_bus'])
@@ -499,7 +499,7 @@ if __name__ == '__main__':
             "inventory": inventory,
             "internal_bus": internal_bus,
             "rpcserver": rpcserver,
-            "dry_run": dry_run,
+            "dry_run": do_dry_run,
             "ci_generate_doc": ci_doc_app_name,
             "ci_check_doc": ci_check_doc_app_name,
         })
