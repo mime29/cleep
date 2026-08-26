@@ -77,8 +77,10 @@ installDefaultApps() {
 case "$1" in
     install | upgrade)
         # install pip (or upgrade if necessary)
+        # bootstrap.pypa.io/get-pip.py requires Python >= 3.10; use versioned URL for 3.9 (bullseye).
         echo "Installing pip..."
-        wget -q --no-check-certificate "https://bootstrap.pypa.io/get-pip.py" -O /tmp/get-pip.py
+        PY_MINOR=$(python3 -c 'import sys; print(sys.version_info.minor)')
+        wget -q --no-check-certificate "https://bootstrap.pypa.io/pip/3.${PY_MINOR}/get-pip.py" -O /tmp/get-pip.py
         checkResult $? 0
         python3 /tmp/get-pip.py --trusted-host pypi.python.org
         checkResult $? 0

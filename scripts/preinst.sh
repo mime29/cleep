@@ -23,9 +23,10 @@ echo ""
 
 # install pip (or upgrade if necessary)
 echo "Installing pip..."
-wget --no-check-certificate -P /tmp/ "https://bootstrap.pypa.io/get-pip.py"
+PY_MINOR=$(python3 -c 'import sys; print(sys.version_info.minor)')
+wget --no-check-certificate -O /tmp/get-pip.py "https://bootstrap.pypa.io/pip/3.${PY_MINOR}/get-pip.py"
 checkResult $? 0
-python /tmp/get-pip.py --trusted-host pypi.python.org
+python3 /tmp/get-pip.py --trusted-host pypi.python.org
 checkResult $? 0
 rm -f /tmp/get-pip.py
 echo "Done"

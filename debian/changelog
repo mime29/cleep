@@ -2,6 +2,7 @@ cleep (0.1.2) unstable; urgency=low
   * Fixed bin: dry-run no longer shadows dry_run() (CI smoke test)
   * Fixed package: ship zope.interface / zope.event pins required by gevent
   * Fixed package: quieter deb build (setuptools license/packages, debian Depends)
+  * Fixed package: get-pip URL for Python 3.9 (bullseye) in preinst
   * Fixed tests: libs.tests init for app CI
   * Changed CI: Drone pipelines removed (Woodpecker in cleep-ci)
 
