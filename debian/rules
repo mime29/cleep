@@ -16,6 +16,12 @@ execute_after_dh_fixperms:
 override_dh_python3:
 	dh_python3 --no-guessing-deps
 
+# pybuild writes install_layout into .pydistutils.cfg (Debian distutils patch).
+# setuptools' vendored distutils rejects that option; stdlib distutils accepts it.
+# Brings a SetuptoolsDeprecationWarning — required for dh_auto_install to succeed.
+override_dh_auto_install:
+	export SETUPTOOLS_USE_DISTUTILS=stdlib && dh_auto_install
+
 clean:
 	rm -rf debian/cleep
 	rm -f debian/debhelper-build-stamp
