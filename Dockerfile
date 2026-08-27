@@ -1,9 +1,10 @@
 FROM 192.168.1.125:5000/raspberrypios/bullseye:20231205
 
-RUN apt-get -o Acquire::ForceIPv4=true update -qqy
-RUN apt-get -o Acquire::ForceIPv4=true upgrade -qqy 2>/dev/null >/dev/null
-RUN apt-get -o Acquire::ForceIPv4=true install python3 wget zip git -qqy
-RUN apt-get clean
+# No apt upgrade — slow/fragile on Pi CI; snapshot base is enough for the runtime image.
+RUN apt-get -o Acquire::ForceIPv4=true update -qqy \
+    && apt-get -o Acquire::ForceIPv4=true install -qqy --no-install-recommends python3 wget zip git \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY cleep.deb .
 RUN CLEEP_ENV=ci apt-get install ./cleep.deb -qyf
