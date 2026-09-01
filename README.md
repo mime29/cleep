@@ -109,6 +109,16 @@ A module can expose public Python methods as RPC commands, store configuration
 in `/etc/cleep`, register devices, send events, and communicate with other
 modules through the internal bus.
 
+## Security
+
+Cleep is designed to run on a trusted local network. Do not expose the web
+interface or RPC API directly to the internet.
+
+For now, deploy Cleep behind your router or firewall, keep it on a private LAN,
+and enable authentication before sharing access with other users. If remote
+access is needed, use a VPN or another secure tunnel instead of opening Cleep
+ports publicly.
+
 ## Motion Sensor To MQTT Example
 
 This example shows the shape of a simple module that reads a PIR motion sensor
